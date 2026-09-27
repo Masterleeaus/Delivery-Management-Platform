@@ -1,187 +1,124 @@
 # Delivery Management Platform
 
-This project is a scalable SaaS-style platform designed to assist delivery companies in managing their operations efficiently. The platform is built using Laravel, a PHP framework, and utilizes the Filament package for the admin panel, Stancl/Tenancy for multi-tenancy support, and Vue.js for the client panel.
+**A modular multi-tenant Laravel application for delivery-company administration, customer accounts, orders, agents and fleet operations.**
 
-## Features:
+## Overview
 
-- **Multi-Tenancy:** The platform supports multi-tenancy to ensure data segregation and security between different delivery companies. Each company has its own dedicated space within the platform.
+This repository implements a conventional SaaS-style delivery-management system using Laravel modules. Its value is primarily as a reference for full-stack and backend architecture: tenant isolation, modular domain boundaries, role/permission infrastructure, order operations, administrative interfaces and container-oriented deployment.
 
-- **User Management:**
-    - Users can log in, access the system, and create orders for clients.
-    - Agents have the ability to create orders for delivery to their client's addresses.
+The codebase is **not presented as an original greenfield implementation by Jason Lee**. It retains clear upstream Mohaphez authorship and project lineage in source metadata. That provenance materially affects its value as personal engineering evidence and should be considered before keeping it public for job applications.
 
-- **Order Management:**
-    - Represents the amount of item to be delivered to the client's address.
-    - Orders are created and saved by users.
+## Verified Capabilities
 
-- **Modular Structure:**
-    - The project is organized into modules, each focusing on specific functionalities.
-    - Modules use services and repositories for efficient code organization and separation of concerns.
+- Laravel 10 application architecture.
+- Modular domains for Agent, Client, Core, Manager, Order, Permission, Support, Tenant, Theme, Truck and User concerns.
+- Authentication middleware and Laravel Sanctum dependency.
+- Multi-tenant application structure.
+- Order-management domain module.
+- Agent/client/manager application separation.
+- Fleet/truck domain module.
+- Role and permission infrastructure.
+- Theme/module composition.
+- PHPUnit test tooling.
+- Docker/Sail-oriented development setup.
+- GitHub Actions deployment workflow and Dockerfile assets.
 
-- **Vue.js Components:**
-    - The client panel is built using Vue.js components, ensuring a smooth and responsive user experience.
+## Architecture
 
-- **Testing:**
-    - Some modules include feature tests to ensure code quality and reliability.
-
-- **Themes:**
-    - The platform supports a multi-theme structure, providing flexibility in the visual appearance.
-
-- **Filament Admin Panel:**
-    - Utilizes Filament for the admin panel, offering a powerful and customizable interface for managing system users and entities.
-
-## Deployment:
-### Development Environment (Sail Docker):
-
-- Clone the repository:
-
-```bash
-git clone https://github.com/mohaphez/delivery-platform.git
-cd delivery-platform
+```mermaid
+flowchart TD
+    U[Users] --> APP[Laravel Application]
+    APP --> AUTH[Authentication + Permissions]
+    AUTH --> TEN[Tenant Boundary]
+    TEN --> CLIENT[Client Module]
+    TEN --> AGENT[Agent Module]
+    TEN --> ORDER[Order Module]
+    TEN --> TRUCK[Truck / Fleet Module]
+    TEN --> SUPPORT[Support Module]
+    APP --> ADMIN[Manager / Filament Modules]
+    ORDER --> DB[(Tenant Data)]
+    AGENT --> DB
+    CLIENT --> DB
+    TRUCK --> DB
 ```
 
-- Install the project dependencies using Composer:
+## Example Workflow
+
+1. A user authenticates into the appropriate tenant/application surface.
+2. Tenant context determines the isolated company scope.
+3. A client or agent creates/manages an order through the order domain.
+4. Role/permission rules control access to operational actions.
+5. Fleet and user modules provide related operational entities.
+6. Manager/admin surfaces expose system and tenant administration.
+
+## Tech Stack
+
+| Area | Technology |
+|---|---|
+| Language | PHP 8.2, JavaScript |
+| Backend | Laravel 10 |
+| Frontend | Laravel/Vite; modular theme assets |
+| Authentication | Laravel Sanctum |
+| Architecture | `nwidart/laravel-modules` |
+| Data | Laravel database layer |
+| Testing | PHPUnit 10 |
+| Infrastructure | Laravel Sail/Docker, GitHub Actions |
+
+## Engineering Notes
+
+### Modular domain separation
+The repository separates operational areas into Laravel modules instead of concentrating delivery logic in the application root. This is useful for studying boundaries between tenant, order, agent, fleet and administration concerns.
+
+### Multi-tenant SaaS structure
+Tenant isolation is a first-class architectural concern, allowing multiple delivery businesses to operate through the same application structure while keeping company context separated.
+
+### Deployment automation
+The repository includes Docker deployment assets and a GitHub Actions workflow intended to test, build and publish deployment artifacts.
+
+## Getting Started
+
+The existing project is configured around Laravel Sail. At a high level:
 
 ```bash
-docker run --rm \
-    -u "$(id -u):$(id -g)" \
-    -v "$(pwd):/var/www/html" \
-    -w /var/www/html \
-    laravelsail/php82-composer:latest \
-    composer install --ignore-platform-reqs --no-scripts
-```
-
-- Copy the .env.example file:
-
-```bash
+composer install
 cp .env.example .env
-```
-
-- Edit the .env file and configure the database and other necessary settings.
-
-- Run the Laravel Sail containers:
-
-```bash
 ./vendor/bin/sail up -d
-```
-
-- Generate the application key:
-
-```bash
 ./vendor/bin/sail artisan key:generate
-```
-
-- Update the Composer dependencies (required):
-```bash
-./vendor/bin/sail composer update
-```
-
-- Migrate the database:
-
-```bash
 ./vendor/bin/sail artisan module:migrate
-./vendor/bin/sail artisan module:seed
-./vendor/bin/sail artisan tenants:run module:seed
 ```
 
-- Assign the role and permission to the default user:
+Additional module seeding, permission generation and frontend setup are required by the upstream application configuration. Inspect the module and environment configuration before running it; do not use example credentials in a public deployment.
 
-```bash
-./vendor/bin/sail artisan shield:generate --resource=RoleResource --option=permissions
+## Repository Structure
 
-./vendor/bin/sail artisan shield:super-admin
-
-./vendor/bin/sail artisan tenants:run shield:generate --option="resource=RoleResource" --option="option=permissions"
-
-./vendor/bin/sail artisan tenants:run shield:super-admin
+```text
+app/                 Laravel application shell
+modules/             Domain modules
+  Agent/
+  Client/
+  Manager/
+  Order/
+  Permission/
+  Tenant/
+  Truck/
+  User/
+themes/              Theme packages
+database/            Application database setup
+.github/             Deployment assets and workflow
 ```
 
-- Install NPM dependencies and compile assets:
+## Status
 
-```bash
-./vendor/bin/sail npm install && ./vendor/bin/sail npm run mars:install
-```
+**Archive / replacement candidate for personal job-application use.** The software itself is a substantial full-stack Laravel codebase, but retained upstream attribution throughout the repository means it is weak evidence of Jason Lee's original engineering unless there is a clearly documented, substantial set of personal modifications that can be isolated and demonstrated.
 
-- Run npm watch to compile assets:
+## Provenance
 
-```bash
-./vendor/bin/sail npm run mars:dev
-```
-- Set domain and subdomains in the hosts file:
+The previous README, clone instructions, screenshots and module metadata identify the upstream project/author as `mohaphez/delivery-platform` / Mohaphez. That provenance should remain visible. A README rewrite alone does not make upstream code original work.
 
-```bash
- 127.0.0.1 center.test
- 127.0.0.1 haio.center.test
- 127.0.0.1 petro.center.test
- ```
+## License
 
-### Access the Lord application manager panel at http://center.test/manager/login.
+The root Composer metadata declares MIT. Verify the upstream repository's complete license and attribution requirements before redistribution or modification of licensing material.
 
-![image](https://github.com/mohaphez/delivery-platform/assets/20874565/32b39c5a-741b-425d-ac8b-f6991bf4d2dc)
+---
 
-### Access the client Haio application at http://haio.center.test.
-
-![image](https://github.com/mohaphez/delivery-platform/assets/20874565/473fa4bd-6c06-4119-94b4-f8c5b5918732)
-
-### Access the client Petro application at http://petro.center.test.
-
-![image](https://github.com/mohaphez/delivery-platform/assets/20874565/971e5a61-644e-4958-b0a2-c86bf09c91f0)
-
-### Access the Haio application agent panel at http://haio.center.test/agent/login.
-
-![image](https://github.com/mohaphez/delivery-platform/assets/20874565/2aad8991-785a-4ab5-9859-8b98f6b8046b)
-
-### Access the Petro application agent panel at http://petro.center.test/agent/login.
-
-![image](https://github.com/mohaphez/delivery-platform/assets/20874565/175c8770-7f98-4089-8ace-922e1342899b)
-
-
-
-### Default Credentials
-
-- Admin User:
-  - Username: admin@example.com
-  - Password: password
-- Agent User:
-  - Username: agent@example.com
-  - Password: password
-- Client User:
-  - Username: client@example.com
-  - Password: password
-
-## CI/CD:
-
-- CI/CD are managed through GitHub Actions.
-- The GitHub Actions workflow can be found in the `.github` folder.
-- The workflow includes the following steps:
-
-  1. **Test Stage:**
-    - After each merge pull request, tests are automatically run to ensure code quality and reliability.
-    - Any issues identified during testing will halt the deployment process.
-
-  2. **Docker Image Creation:**
-    - Upon successful testing, a Docker image is created for the latest version of the code.
-    - The Dockerfile and configuration files for the staging environment are utilized during this process.
-
-  3. **Docker Image Push:**
-    - The newly created Docker image is then pushed to the Docker registry, making it accessible for deployment in production.
-
-- This automated workflow ensures consistency, reliability, and efficiency in deploying the latest code changes to the production environment.
-
-## Additional Information:
-
-- **Tenancy Management:**
-    - The Stancl/Tenancy package is used for efficient tenancy management, separating databases, caches, and events for each tenant.
-
-- **Filament Admin Panel:**
-    - Filament is used for the admin panel, providing a rich and extensible interface for managing system users, entities, and configurations.
-    - Advantages include a customizable dashboard, user management, entity management, and a built-in role and permission system.
-
-
-## Contact Me:
-
-If you have any questions, suggestions, or just want to chat about this project or anything related, feel free to reach out. I'm always open to collaboration and discussions.
-
-- **Email:** mohaphez[at]gmail.com
-
-Looking forward to connecting with you!
+**Repository owner:** [@Masterleeaus](https://github.com/Masterleeaus)
