@@ -4,6 +4,13 @@
 
 **A modular multi-tenant Laravel application for delivery-company administration, customer accounts, orders, agents and fleet operations.**
 
+## Product architecture and engineering highlights
+
+A multi-tenant delivery-operations application covering customers, delivery agents, orders, permissions, support, and fleet-oriented administration.
+
+- **Architecture:** A Laravel modular monolith separates Agent, Client, Manager, Order, Tenant, Truck, Support, User, and related domains, with Sanctum authentication and role/permission infrastructure.
+- **Distinctive engineering:** The system illustrates tenant-aware business workflows and role-specific operational surfaces; the source retains its upstream Mohaphez lineage.
+
 ## Overview
 
 This repository implements a conventional SaaS-style delivery-management system using Laravel modules. Its value is primarily as a reference for full-stack and backend architecture: tenant isolation, modular domain boundaries, role/permission infrastructure, order operations, administrative interfaces and container-oriented deployment.
