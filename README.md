@@ -1,6 +1,6 @@
 ![Delivery Management Reference Application — ATTRIBUTED SOURCE REFERENCE](docs/images/portfolio-banner.svg)
 
-# Delivery Management Platform
+# Delivery Management Reference Application
 
 **A modular multi-tenant Laravel application for delivery-company administration, customer accounts, orders, agents and fleet operations.**
 
