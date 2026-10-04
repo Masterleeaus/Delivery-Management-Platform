@@ -1,4 +1,4 @@
-![Delivery Management Reference Application - ATTRIBUTED SOURCE REFERENCE](docs/images/portfolio-banner.svg)
+![Delivery Management Reference Application — ATTRIBUTED SOURCE REFERENCE](docs/images/portfolio-banner.svg)
 
 # Delivery Management Reference Application
 
@@ -141,4 +141,3 @@ The root Composer metadata declares MIT. Verify the upstream repository's comple
 ---
 
 **Repository owner:** [@Masterleeaus](https://github.com/Masterleeaus)
-
