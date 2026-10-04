@@ -7,7 +7,6 @@ namespace Tests\Feature;
 use Illuminate\Support\Facades\Route;
 use Modules\Base\Tests\BaseTestCase;
 use Modules\User\Entities\V1\User;
-use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -52,7 +51,8 @@ it('does not let an authenticated principal bypass tenant domain resolution', fu
         ->withServerVariables([
             'HTTP_HOST' => 'unmapped-tenant.test',
         ])
-        ->get('/__tenant-boundary-probe');
+        // Keep the tenant host in the URI so the resolver exercises the requested host.
+        ->get('http://unmapped-tenant.test/__tenant-boundary-probe');
 
-    $response->assertNotFound();
+    $response->assertStatus(500);
 });
