@@ -94,7 +94,7 @@ jobs:
           SYNTHETIC_VERIFY_OUTCOME: ${{ steps.synthetic-verify.outcome }}
         run: |
           set -euo pipefail
-          grep -q '^    needs: verify .github/workflows/.deploy.yml
+          grep -q "    needs: verify" .github/workflows/.deploy.yml
           grep -q "needs.verify.result == 'success'" .github/workflows/.deploy.yml
           test "$SYNTHETIC_VERIFY_OUTCOME" = "failure"
           echo "Failure fixture: verify=$SYNTHETIC_VERIFY_OUTCOME -> deployment condition=false -> deployment skipped."
