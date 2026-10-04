@@ -45,6 +45,7 @@ it('rejects tenant entry points on a configured central domain', function (): vo
 
 it('does not let an authenticated principal bypass tenant domain resolution', function (): void {
     config([
+        'app.debug' => false,
         'tenancy.central_domains' => [
             'localhost',
             'center.test',
@@ -61,7 +62,7 @@ it('does not let an authenticated principal bypass tenant domain resolution', fu
         // Keep the tenant host in the URI so the resolver exercises the requested host.
         ->get('http://unmapped-tenant.test/__tenant-boundary-probe');
 
-    $response->assertStatus(500);
+    $response->assertNotFound();
 });
 
 
