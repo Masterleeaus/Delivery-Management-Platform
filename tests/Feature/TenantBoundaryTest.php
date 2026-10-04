@@ -52,7 +52,8 @@ it('does not let an authenticated principal bypass tenant domain resolution', fu
         ->withServerVariables([
             'HTTP_HOST' => 'unmapped-tenant.test',
         ])
-        ->get('/__tenant-boundary-probe');
+        // Keep the tenant host in the URI so the resolver exercises the requested host.
+        ->get('http://unmapped-tenant.test/__tenant-boundary-probe');
 
     $response->assertNotFound();
 });
