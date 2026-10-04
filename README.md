@@ -1,10 +1,14 @@
-![Delivery Management Reference Application — ATTRIBUTED SOURCE REFERENCE](docs/images/portfolio-banner.svg)
+![Delivery Management Reference Application — attributed Laravel modular monolith for tenant, order, agent, fleet, and support operations](docs/images/delivery-management-banner.svg)
 
 # Delivery Management Reference Application
 
 **A modular multi-tenant Laravel application for delivery-company administration, customer accounts, orders, agents and fleet operations.**
 
 ## Product architecture and engineering highlights
+
+<p align="center">
+  <img src="docs/images/delivery-management-architecture.svg" alt="Delivery Management Platform flow from Laravel users and tenant boundary through attributed Agent, Client, Order, Fleet, and Support modules." width="100%" />
+</p>
 
 A multi-tenant delivery-operations application covering customers, delivery agents, orders, permissions, support, and fleet-oriented administration.
 
