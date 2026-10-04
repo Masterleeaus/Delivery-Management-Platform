@@ -106,6 +106,12 @@ cp .env.example .env
 ./vendor/bin/sail artisan module:migrate
 ```
 
+The tracked frontend is the Mars theme. With Node.js/npm installed, build its Vite assets from the repository root:
+
+```bash
+npm run production
+```
+
 Additional module seeding, permission generation and frontend setup are required by the upstream application configuration. Inspect the module and environment configuration before running it; do not use example credentials in a public deployment.
 
 ## Repository Structure
