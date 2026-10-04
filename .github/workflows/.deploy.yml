@@ -20,6 +20,11 @@ jobs:
       DB_CONNECTION: sqlite
       DB_DATABASE: testing
       CENTRAL_DOMAINS: localhost,center.test
+      CACHE_DRIVER: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      FILESYSTEM_DISK: local
 
     steps:
       - name: Checkout code
