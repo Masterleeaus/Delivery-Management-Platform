@@ -47,8 +47,8 @@ jobs:
           cp .env.development.template .env
           php artisan key:generate --force
           mkdir -p database
-          rm -f database/testing
-          touch database/testing
+          rm -f testing
+          touch testing
           php artisan about
 
       - name: Migrate and seed modules
