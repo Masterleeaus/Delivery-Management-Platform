@@ -3,22 +3,23 @@ name: Build & Deploy to Stage
 on:
   pull_request:
     branches:
+      - main
       - dev
     types:
+      - opened
+      - synchronize
+      - reopened
       - closed
 
 jobs:
-  build-deploy:
-    if: github.event.pull_request.merged == true
+  verify:
+    if: github.event.action != 'closed' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - php-version: 8.2
-            experimental: true
-            composer_args: "--optimize-autoloader --no-interaction --prefer-dist --ignore-platform-reqs --no-scripts"
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: testing
+      CENTRAL_DOMAINS: localhost,center.test
 
     steps:
       - name: Checkout code
@@ -27,7 +28,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: 8.2
           extensions: intl, zip, gd, pdo_mysql, opcache, pcntl, bcmath, sockets, exif, imagick, redis, apcu, memcached, mongodb
 
       - name: Validate composer.json
@@ -37,22 +38,46 @@ jobs:
         run: |
           php -v
           composer -V
-          composer install
+          composer install --no-interaction --prefer-dist --optimize-autoloader
         env:
-          COMPOSER_CACHE_DIR: /var/www/caches/dev_composer_cache
+          COMPOSER_CACHE_DIR: ${{ github.workspace }}/.composer-cache
 
-      - name: Setup Laravel
+      - name: Configure SQLite test database
         run: |
-          php -v
-          php artisan --version
+          cp .env.development.template .env
+          php artisan key:generate --force
+          rm -f testing
+          touch testing
           php artisan about
-          cp .env.development .env
-          php artisan key:generate
-          sqlite3 testing "VACUUM;"
+
+      - name: Migrate and seed modules
+        run: |
           php artisan module:migrate
           php artisan module:seed
+
+      - name: Run application test suite
+        run: php artisan test
+
+      - name: Run maintained profile and tenant-boundary tests
+        run: >-
           php artisan test
-          rm -rf testing
+          modules/User/Tests/Feature/API/V1/Profile/ProfileControllerTest.php
+          modules/Tenant/Tests/Feature/TenantBoundaryTest.php
+
+  build-deploy:
+    needs: verify
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev' && needs.verify.result == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: intl, zip, gd, pdo_mysql, opcache, pcntl, bcmath, sockets, exif, imagick, redis, apcu, memcached, mongodb
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
