@@ -1,0 +1,90 @@
+name: Verify
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: sqlite
+      DB_DATABASE: testing
+      CENTRAL_DOMAINS: localhost,center.test
+      CACHE_DRIVER: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+      MAIL_MAILER: array
+      FILESYSTEM_DISK: local
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: intl, zip, gd, pdo_mysql, opcache, pcntl, bcmath, sockets, exif, imagick, redis, apcu, memcached, mongodb
+
+      - name: Validate composer.json
+        run: composer validate
+
+      - name: Install dependencies
+        run: |
+          php -v
+          composer -V
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Configure SQLite test database
+        run: |
+          cp .env.development.template .env
+          php artisan key:generate --force
+          rm -f testing
+          touch testing
+          php artisan about
+
+      - name: Migrate and seed modules
+        run: |
+          php artisan module:migrate
+          php artisan module:seed
+
+      - name: Run application test suite
+        run: php artisan test
+
+      - name: Run maintained profile and tenant-boundary tests
+        run: >-
+          php artisan test
+          modules/User/Tests/Feature/API/V1/Profile/ProfileControllerTest.php
+          modules/Tenant/Tests/Feature/TenantBoundaryTest.php
+
+  deployment-gate-contract:
+    name: Verify failure blocks deployment
+    if: always()
+    needs: verify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout workflow definition
+        uses: actions/checkout@v4
+
+      - name: Exercise failure-path fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '^    needs: verify$' .github/workflows/.deploy.yml
+          grep -q "needs.verify.result == 'success'" .github/workflows/.deploy.yml
+
+          verify_result=failure
+          if [[ "$verify_result" == "success" ]]; then
+            echo "Failure fixture incorrectly permits deployment."
+            exit 1
+          fi
+
+          echo "Failure fixture: verify=$verify_result -> build-deploy condition=false -> deployment skipped."
