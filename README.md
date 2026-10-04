@@ -1,25 +1,29 @@
 ![Delivery Management Reference Application — attributed Laravel modular monolith for tenant, order, agent, fleet, and support operations](docs/images/delivery-management-banner.svg)
 
-# Delivery Management Reference Application
+# Delivery Management Platform
 
-**A modular multi-tenant Laravel application for delivery-company administration, customer accounts, orders, agents and fleet operations.**
+> A modular multi-tenant Laravel application for delivery-company administration, customer accounts, orders, agents, and fleet operations.
 
-## Product architecture and engineering highlights
+Delivery Management Platform provides a reference architecture for delivery businesses that need tenant-aware operations rather than a single undifferentiated admin panel. Its modular monolith separates delivery domains, role-specific surfaces, authentication, and fleet concerns so teams can study how the pieces fit together in one Laravel application.
 
 <p align="center">
   <img src="docs/images/delivery-management-architecture.svg" alt="Delivery Management Platform flow from Laravel users and tenant boundary through attributed Agent, Client, Order, Fleet, and Support modules." width="100%" />
 </p>
 
-A multi-tenant delivery-operations application covering customers, delivery agents, orders, permissions, support, and fleet-oriented administration.
+## What the platform demonstrates
 
-- **Architecture:** A Laravel modular monolith separates Agent, Client, Manager, Order, Tenant, Truck, Support, User, and related domains, with Sanctum authentication and role/permission infrastructure.
-- **Distinctive engineering:** The system illustrates tenant-aware business workflows and role-specific operational surfaces; the source retains its upstream Mohaphez lineage.
+| Capability | Implementation evidence |
+|---|---|
+| Modular delivery domains | `modules_statuses.json`, `config/modules.php`, and `modules/*/module.json` define enabled Agent, Client, Manager, Order, Tenant, Truck, User, and supporting modules. |
+| Customer orders and delivery details | `modules/Order/` contains customer-order workflows including delivery date/location and related domain persistence. |
+| Fleet assignment and delivery costs | `modules/Truck/` contains fleet workflows for truck assignment and fuel volume/pricing data. |
+| Domain-based tenant isolation | `modules/Tenant/`, `TenantServiceProvider`, and the `Tenant` model create/migrate separate tenant databases and scope cache, filesystem, and queue context. |
+| Role-specific workflows | `modules/*/Filament/Agent/`, `modules/*/Filament/Manager/`, and `AgentPanelProvider` provide separate operational and administration surfaces. |
+| API and infrastructure | `modules/User/Routes/API/V1/`, PHPUnit tooling, and Laravel Sail/Docker assets provide a concrete API/module/runtime reference. |
 
-## Overview
+The differentiator is domain-based tenancy: tenant database lifecycle and scoped cache, filesystem, and queue context sit alongside concrete customer-order and fleet workflows in the same modular application.
 
-This repository implements a conventional SaaS-style delivery-management system using Laravel modules. Its value is primarily as a reference for full-stack and backend architecture: tenant isolation, modular domain boundaries, role/permission infrastructure, order operations, administrative interfaces and container-oriented deployment.
-
-The codebase is **not presented as an original greenfield implementation by Jason Lee**. It retains clear upstream Mohaphez authorship and project lineage in source metadata. That provenance materially affects its value as personal engineering evidence and should be considered before keeping it public for job applications.
+**Provenance:** this repository retains the Mohaphez / `mohaphez/delivery-platform` lineage and attribution.
 
 ## Verified Capabilities
 
@@ -27,7 +31,10 @@ The codebase is **not presented as an original greenfield implementation by Jaso
 - Modular domains for Agent, Client, Core, Manager, Order, Permission, Support, Tenant, Theme, Truck and User concerns.
 - Authentication middleware and Laravel Sanctum dependency.
 - Multi-tenant application structure.
+- Domain-based tenant database creation/migration with cache, filesystem and queue scoping.
 - Order-management domain module.
+- Customer orders with delivery date and location data.
+- Truck assignment with fuel volume and pricing data.
 - Agent/client/manager application separation.
 - Fleet/truck domain module.
 - Role and permission infrastructure.
@@ -59,9 +66,9 @@ flowchart TD
 
 1. A user authenticates into the appropriate tenant/application surface.
 2. Tenant context determines the isolated company scope.
-3. A client or agent creates/manages an order through the order domain.
+3. A client or agent creates/manages a customer order with delivery date and location through the order domain.
 4. Role/permission rules control access to operational actions.
-5. Fleet and user modules provide related operational entities.
+5. Truck/fleet workflows assign vehicles and track fuel volume and pricing alongside user operations.
 6. Manager/admin surfaces expose system and tenant administration.
 
 ## Tech Stack
@@ -82,8 +89,8 @@ flowchart TD
 | Concern | Location | What is actually present |
 |---|---|---|
 | Module composition | `modules_statuses.json`, `config/modules.php`, `modules/*/module.json` | Agent, Client, Manager, Order, Permission, Tenant, Truck, User and supporting modules are enabled in the snapshot |
-| Tenant and delivery domains | `modules/Tenant/`, `modules/Order/`, `modules/Agent/`, `modules/Truck/` | tenant/domain entities, migrations, repositories, services and Filament resources |
-| Role-specific surfaces | `modules/*/Filament/Agent/` and `modules/*/Filament/Manager/` | separate operational/admin resource areas |
+| Tenant and delivery domains | `modules/Tenant/`, `modules/Order/`, `modules/Agent/`, `modules/Truck/` | tenant/domain entities, migrations, repositories, services and Filament resources, including customer orders, delivery date/location, truck assignment and fuel data |
+| Role-specific surfaces | `modules/*/Filament/Agent/`, `modules/*/Filament/Manager/`, `AgentPanelProvider` | separate agent/manager operational and administration resource areas |
 | API example | `modules/User/Routes/API/V1/` and `modules/User/Http/` | versioned profile routes, requests and resources |
 | Automated checks | `modules/User/Tests/Feature/API/V1/Profile/ProfileControllerTest.php` plus PHPUnit tooling | one module feature test is present; a root `tests/` suite and deployment workflow are not present in this snapshot |
 
@@ -92,8 +99,8 @@ flowchart TD
 ### Modular domain separation
 The repository separates operational areas into Laravel modules instead of concentrating delivery logic in the application root. This is useful for studying boundaries between tenant, order, agent, fleet and administration concerns.
 
-### Multi-tenant SaaS structure
-Tenant isolation is a first-class architectural concern, allowing multiple delivery businesses to operate through the same application structure while keeping company context separated.
+### Domain-based tenant isolation
+The tenant domain creates and migrates separate tenant databases and keeps runtime context scoped across cache, filesystem and queue operations. `TenantServiceProvider` and the `Tenant` model provide the tenant lifecycle boundary, while `AgentPanelProvider` supports the agent-facing panel.
 
 ### Local infrastructure
 The repository includes Docker Compose/Sail-oriented local infrastructure. Deployment automation is not part of the current repository snapshot.
@@ -138,11 +145,11 @@ database/            Application database setup
 
 ## Status
 
-**Archive / replacement candidate for personal job-application use.** The software itself is a substantial full-stack Laravel codebase, but retained upstream attribution throughout the repository means it is weak evidence of Jason Lee's original engineering unless there is a clearly documented, substantial set of personal modifications that can be isolated and demonstrated.
+**Attributed reference application.** This is a substantial modular Laravel codebase for studying tenant-aware delivery operations, customer orders, fleet workflows and role-specific panels.
 
 ## Provenance
 
-The previous README, clone instructions, screenshots and module metadata identify the upstream project/author as `mohaphez/delivery-platform` / Mohaphez. That provenance should remain visible. A README rewrite alone does not make upstream code original work.
+The repository retains the upstream `mohaphez/delivery-platform` / Mohaphez lineage and attribution. Preserve that provenance when extending or redistributing the reference application.
 
 ## License
 
