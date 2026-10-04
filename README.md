@@ -4,13 +4,63 @@
 
 > A modular multi-tenant Laravel application for delivery-company administration, customer accounts, orders, agents, and fleet operations.
 
+## Overview
+
 Delivery Management Platform provides a reference architecture for delivery businesses that need tenant-aware operations rather than a single undifferentiated admin panel. Its modular monolith separates delivery domains, role-specific surfaces, authentication, and fleet concerns so teams can study how the pieces fit together in one Laravel application.
+
+
+## Measured evidence
+
+The strongest focused verification is around the tenant boundary and the maintained profile API.
+
+| Focused evidence | Cases present | What it verifies |
+| --- | ---: | --- |
+| Root tenant-boundary feature file | **3 Pest cases** | central-domain rejection, authenticated-user non-bypass, and unmapped-domain failure before the tenant route handler |
+| Maintained profile API feature file | **4 Pest cases** | unauthenticated rejection, own-profile retrieval, validation failure and persisted profile update |
+| Focused cases across those two files | **7** | tenancy + authenticated API behavior |
+
+The pull-request workflow also performs:
+
+```text
+composer validate
+composer install
+SQLite test configuration
+module:migrate
+module:seed
+php artisan test
+maintained profile-module test
+```
+
+A separate synthetic failure-path job verifies that a failed verification result cannot satisfy the deployment workflow condition.
+
+These are repository verification mechanisms; they do **not** establish a production deployment or claim original authorship of the upstream delivery platform.
+
+## What is new
+
+For portfolio purposes, the technically interesting mechanism is **domain-based tenant isolation spanning database lifecycle, cache, filesystem and queue context**, combined with concrete delivery/order/fleet modules.
+
+```text
+Authenticated user
+      ↓
+Domain → tenant resolution
+      ↓
+Tenant database/context
+      ├── cache scope
+      ├── filesystem scope
+      └── queue scope
+      ↓
+Order / agent / fleet domain
+      ↓
+Role-specific surface
+```
+
+The repository is therefore most useful as an attributed reference architecture for multi-tenant Laravel operations, not as a novel AI system.
 
 <p align="center">
   <img src="docs/images/delivery-management-architecture.svg" alt="Delivery Management Platform flow from Laravel users and tenant boundary through attributed Agent, Client, Order, Fleet, and Support modules." width="100%" />
 </p>
 
-## What the platform demonstrates
+## Verified capabilities
 
 | Capability | Implementation evidence |
 |---|---|
@@ -25,7 +75,7 @@ The differentiator is domain-based tenancy: tenant database lifecycle and scoped
 
 **Provenance:** this repository retains the Mohaphez / `mohaphez/delivery-platform` lineage and attribution.
 
-## Verified Capabilities
+## Capability inventory
 
 - Laravel 10 application architecture.
 - Modular domains for Agent, Client, Core, Manager, Order, Permission, Support, Tenant, Theme, Truck and User concerns.
@@ -62,7 +112,7 @@ flowchart TD
     TRUCK --> DB
 ```
 
-## Example Workflow
+## Example workflow
 
 1. A user authenticates into the appropriate tenant/application surface.
 2. Tenant context determines the isolated company scope.
@@ -71,7 +121,7 @@ flowchart TD
 5. Truck/fleet workflows assign vehicles and track fuel volume and pricing alongside user operations.
 6. Manager/admin surfaces expose system and tenant administration.
 
-## Tech Stack
+## Technology
 
 | Area | Technology |
 |---|---|
@@ -105,7 +155,7 @@ The tenant domain creates and migrates separate tenant databases and keeps runti
 ### Local infrastructure
 The repository includes Docker Compose/Sail-oriented local infrastructure. Deployment automation is defined in `.github/workflows/.deploy.yml`, while `.github/workflows/verify.yml` runs the pull-request verifier. The stage image build/push path is guarded by successful verification and a merged pull request targeting `dev`; this documents the workflow contract, not production readiness.
 
-## Getting Started
+## Installation and quick start
 
 The existing project is configured around Laravel Sail. At a high level:
 
@@ -125,7 +175,7 @@ npm run production
 
 Additional module seeding, permission generation and frontend setup are required by the upstream application configuration. Inspect the module and environment configuration before running it; do not use example credentials in a public deployment.
 
-## Repository Structure
+## Repository structure
 
 ```text
 app/                 Laravel application shell
