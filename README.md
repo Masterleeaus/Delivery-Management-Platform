@@ -92,7 +92,7 @@ flowchart TD
 | Tenant and delivery domains | `modules/Tenant/`, `modules/Order/`, `modules/Agent/`, `modules/Truck/` | tenant/domain entities, migrations, repositories, services and Filament resources, including customer orders, delivery date/location, truck assignment and fuel data |
 | Role-specific surfaces | `modules/*/Filament/Agent/`, `modules/*/Filament/Manager/`, `AgentPanelProvider` | separate agent/manager operational and administration resource areas |
 | API example | `modules/User/Routes/API/V1/` and `modules/User/Http/` | versioned profile routes, requests and resources |
-| Automated checks | `modules/User/Tests/Feature/API/V1/Profile/ProfileControllerTest.php` plus PHPUnit tooling | one module feature test is present; a root `tests/` suite and deployment workflow are not present in this snapshot |
+| Automated checks | `tests/Feature/TenantBoundaryTest.php`, `modules/User/Tests/Feature/API/V1/Profile/ProfileControllerTest.php`, and PHPUnit tooling | root tenant-boundary checks and the maintained profile module test are exercised by `.github/workflows/verify.yml` and the verification stage of `.github/workflows/.deploy.yml` using SQLite setup; image build/push remains separately gated |
 
 ## Engineering Notes
 
@@ -103,7 +103,7 @@ The repository separates operational areas into Laravel modules instead of conce
 The tenant domain creates and migrates separate tenant databases and keeps runtime context scoped across cache, filesystem and queue operations. `TenantServiceProvider` and the `Tenant` model provide the tenant lifecycle boundary, while `AgentPanelProvider` supports the agent-facing panel.
 
 ### Local infrastructure
-The repository includes Docker Compose/Sail-oriented local infrastructure. Deployment automation is not part of the current repository snapshot.
+The repository includes Docker Compose/Sail-oriented local infrastructure. Deployment automation is defined in `.github/workflows/.deploy.yml`, while `.github/workflows/verify.yml` runs the pull-request verifier. The stage image build/push path is guarded by successful verification and a merged pull request targeting `dev`; this documents the workflow contract, not production readiness.
 
 ## Getting Started
 
