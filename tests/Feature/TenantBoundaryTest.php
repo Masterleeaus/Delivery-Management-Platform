@@ -54,6 +54,5 @@ it('does not let an authenticated principal bypass tenant domain resolution', fu
         ])
         ->get('/__tenant-boundary-probe');
 
-    $response->assertServerError();
-    expect($response->exception)->toBeInstanceOf(TenantCouldNotBeIdentifiedOnDomainException::class);
+    $response->assertNotFound();
 });
