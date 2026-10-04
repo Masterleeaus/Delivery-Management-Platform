@@ -14,6 +14,8 @@ on:
 jobs:
   verify:
     if: github.event.action != 'closed' || github.event.pull_request.merged == true
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     env:
       APP_ENV: testing
@@ -29,6 +31,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -72,11 +76,15 @@ jobs:
   build-deploy:
     needs: verify
     if: github.event.action == 'closed' && github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'dev' && needs.verify.result == 'success'
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
