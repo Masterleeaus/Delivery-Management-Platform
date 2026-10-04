@@ -1,4 +1,4 @@
-![Delivery Management Reference Application — ATTRIBUTED SOURCE REFERENCE](docs/images/portfolio-banner.svg)
+![Delivery Management Reference Application - ATTRIBUTED SOURCE REFERENCE](docs/images/portfolio-banner.svg)
 
 # Delivery Management Reference Application
 
@@ -30,7 +30,7 @@ The codebase is **not presented as an original greenfield implementation by Jaso
 - Theme/module composition.
 - PHPUnit test tooling.
 - Docker/Sail-oriented development setup.
-- GitHub Actions deployment workflow and Dockerfile assets.
+- Composer module merging through `nwidart/laravel-modules` and the repository's module manifests.
 
 ## Architecture
 
@@ -71,7 +71,17 @@ flowchart TD
 | Architecture | `nwidart/laravel-modules` |
 | Data | Laravel database layer |
 | Testing | PHPUnit 10 |
-| Infrastructure | Laravel Sail/Docker, GitHub Actions |
+| Infrastructure | Laravel Sail/Docker |
+
+## Code map and evidence
+
+| Concern | Location | What is actually present |
+|---|---|---|
+| Module composition | `modules_statuses.json`, `config/modules.php`, `modules/*/module.json` | Agent, Client, Manager, Order, Permission, Tenant, Truck, User and supporting modules are enabled in the snapshot |
+| Tenant and delivery domains | `modules/Tenant/`, `modules/Order/`, `modules/Agent/`, `modules/Truck/` | tenant/domain entities, migrations, repositories, services and Filament resources |
+| Role-specific surfaces | `modules/*/Filament/Agent/` and `modules/*/Filament/Manager/` | separate operational/admin resource areas |
+| API example | `modules/User/Routes/API/V1/` and `modules/User/Http/` | versioned profile routes, requests and resources |
+| Automated checks | `modules/User/Tests/Feature/API/V1/Profile/ProfileControllerTest.php` plus PHPUnit tooling | one module feature test is present; a root `tests/` suite and deployment workflow are not present in this snapshot |
 
 ## Engineering Notes
 
@@ -81,8 +91,8 @@ The repository separates operational areas into Laravel modules instead of conce
 ### Multi-tenant SaaS structure
 Tenant isolation is a first-class architectural concern, allowing multiple delivery businesses to operate through the same application structure while keeping company context separated.
 
-### Deployment automation
-The repository includes Docker deployment assets and a GitHub Actions workflow intended to test, build and publish deployment artifacts.
+### Local infrastructure
+The repository includes Docker Compose/Sail-oriented local infrastructure. Deployment automation is not part of the current repository snapshot.
 
 ## Getting Started
 
@@ -113,7 +123,7 @@ modules/             Domain modules
   User/
 themes/              Theme packages
 database/            Application database setup
-.github/             Deployment assets and workflow
+.env.example         Example application configuration
 ```
 
 ## Status
@@ -131,3 +141,4 @@ The root Composer metadata declares MIT. Verify the upstream repository's comple
 ---
 
 **Repository owner:** [@Masterleeaus](https://github.com/Masterleeaus)
+
