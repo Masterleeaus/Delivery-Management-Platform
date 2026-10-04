@@ -1,21 +1,23 @@
 ![Delivery Management Reference Application — ATTRIBUTED SOURCE REFERENCE](docs/images/portfolio-banner.svg)
 
-# Delivery Management Reference Application
+# Delivery Management Platform
 
-**A modular multi-tenant Laravel application for delivery-company administration, customer accounts, orders, agents and fleet operations.**
+> A modular multi-tenant Laravel application for delivery-company administration, customer accounts, orders, agents, and fleet operations.
 
-## Product architecture and engineering highlights
+Delivery Management Platform provides a reference architecture for delivery businesses that need tenant-aware operations rather than a single undifferentiated admin panel. Its modular monolith separates delivery domains, role-specific surfaces, authentication, and fleet concerns so teams can study how the pieces fit together in one Laravel application.
 
-A multi-tenant delivery-operations application covering customers, delivery agents, orders, permissions, support, and fleet-oriented administration.
+## What the platform demonstrates
 
-- **Architecture:** A Laravel modular monolith separates Agent, Client, Manager, Order, Tenant, Truck, Support, User, and related domains, with Sanctum authentication and role/permission infrastructure.
-- **Distinctive engineering:** The system illustrates tenant-aware business workflows and role-specific operational surfaces; the source retains its upstream Mohaphez lineage.
+| Capability | Implementation evidence |
+|---|---|
+| Modular delivery domains | `modules_statuses.json`, `config/modules.php`, and `modules/*/module.json` define enabled Agent, Client, Manager, Order, Tenant, Truck, User, and supporting modules. |
+| Tenant-aware operations | `modules/Tenant/`, `modules/Order/`, `modules/Agent/`, and `modules/Truck/` contain domain entities, migrations, repositories, services, and Filament resources. |
+| Role-specific workflows | `modules/*/Filament/Agent/` and `modules/*/Filament/Manager/` provide separate operational and administration surfaces. |
+| API and infrastructure | `modules/User/Routes/API/V1/`, PHPUnit tooling, and Laravel Sail/Docker assets provide a concrete API/module/runtime reference. |
 
-## Overview
+The value of this repository is architectural: it makes tenant boundaries, order operations, fleet concerns, permissions, and module composition inspectable in a single full-stack codebase.
 
-This repository implements a conventional SaaS-style delivery-management system using Laravel modules. Its value is primarily as a reference for full-stack and backend architecture: tenant isolation, modular domain boundaries, role/permission infrastructure, order operations, administrative interfaces and container-oriented deployment.
-
-The codebase is **not presented as an original greenfield implementation by Jason Lee**. It retains clear upstream Mohaphez authorship and project lineage in source metadata. That provenance materially affects its value as personal engineering evidence and should be considered before keeping it public for job applications.
+**Provenance:** the source retains its Mohaphez / `mohaphez/delivery-platform` lineage, which remains documented below; the repository is presented as an attributed reference application rather than an unqualified original-work claim.
 
 ## Verified Capabilities
 
