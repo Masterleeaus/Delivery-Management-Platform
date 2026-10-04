@@ -104,11 +104,11 @@ jobs:
           set -euo pipefail
           grep -q "    needs: verify" .github/workflows/.deploy.yml
           grep -q "needs.verify.result == 'success'" .github/workflows/.deploy.yml
-          test "$(grep -c '    permissions:' .github/workflows/verify.yml)" -eq 2
-          test "$(grep -c '      contents: read' .github/workflows/verify.yml)" -eq 2
-          test "$(grep -c 'persist-credentials: false' .github/workflows/verify.yml)" -eq 2
-          test "$(grep -c '    permissions:' .github/workflows/.deploy.yml)" -eq 2
-          test "$(grep -c '      contents: read' .github/workflows/.deploy.yml)" -eq 2
-          test "$(grep -c 'persist-credentials: false' .github/workflows/.deploy.yml)" -eq 2
+          test "$(grep -c '^[[:space:]][[:space:]][[:space:]][[:space:]]permissions:' .github/workflows/verify.yml)" -eq 2
+          test "$(grep -c '^[[:space:]][[:space:]][[:space:]][[:space:]][[:space:]][[:space:]]contents: read' .github/workflows/verify.yml)" -eq 2
+          test "$(grep -c '^[[:space:]][[:space:]][[:space:]][[:space:]][[:space:]][[:space:]][[:space:]][[:space:]]persist-credentials: false' .github/workflows/verify.yml)" -eq 2
+          test "$(grep -c '^[[:space:]][[:space:]][[:space:]][[:space:]]permissions:' .github/workflows/.deploy.yml)" -eq 2
+          test "$(grep -c '^[[:space:]][[:space:]][[:space:]][[:space:]][[:space:]][[:space:]]contents: read' .github/workflows/.deploy.yml)" -eq 2
+          test "$(grep -c '^[[:space:]][[:space:]][[:space:]][[:space:]][[:space:]][[:space:]][[:space:]][[:space:]]persist-credentials: false' .github/workflows/.deploy.yml)" -eq 2
           test "$SYNTHETIC_VERIFY_OUTCOME" = "failure"
           echo "Failure fixture: verify=$SYNTHETIC_VERIFY_OUTCOME -> deployment condition=false -> deployment skipped."
