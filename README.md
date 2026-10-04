@@ -26,7 +26,6 @@ The differentiator is domain-based tenancy: tenant database lifecycle and scoped
 **Provenance:** this repository retains the Mohaphez / `mohaphez/delivery-platform` lineage and attribution.
 
 ## Verified Capabilities
-## Verified Capabilities
 
 - Laravel 10 application architecture.
 - Modular domains for Agent, Client, Core, Manager, Order, Permission, Support, Tenant, Theme, Truck and User concerns.
