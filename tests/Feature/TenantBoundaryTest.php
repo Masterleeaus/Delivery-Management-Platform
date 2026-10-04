@@ -47,13 +47,12 @@ it('does not let an authenticated principal bypass tenant domain resolution', fu
 
     registerTenantBoundaryProbe();
 
-    $response = $this
+    expect(fn (): mixed => $this
         ->actingAs(new User())
         ->withServerVariables([
             'HTTP_HOST' => 'unmapped-tenant.test',
         ])
         // Keep the tenant host in the URI so the resolver exercises the requested host.
-        ->get('http://unmapped-tenant.test/__tenant-boundary-probe');
-
-    $response->assertNotFound();
+        ->get('http://unmapped-tenant.test/__tenant-boundary-probe'))
+        ->toThrow(TenantCouldNotBeIdentifiedOnDomainException::class);
 });
