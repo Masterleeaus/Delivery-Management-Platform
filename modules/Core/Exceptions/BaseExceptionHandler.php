@@ -12,6 +12,7 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Validation\ValidationException;
+use Stancl\Tenancy\Exceptions\TenantCouldNotBeIdentifiedOnDomainException;
 use Modules\Support\Traits\V1\ApiResponse\ApiResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,6 +24,10 @@ class BaseExceptionHandler extends ExceptionHandler
 
     public function render($request, $e): \Illuminate\Http\Response|JsonResponse|RedirectResponse|Response
     {
+        if ($e instanceof TenantCouldNotBeIdentifiedOnDomainException) {
+            return response()->noContent(Response::HTTP_NOT_FOUND);
+        }
+
         if ($request->expectsJson() && ! app()->hasDebugModeEnabled()) {
             return $this->handleApiExceptions($request, $e);
         }
