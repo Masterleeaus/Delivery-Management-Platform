@@ -74,17 +74,27 @@ jobs:
       - name: Checkout workflow definition
         uses: actions/checkout@v4
 
-      - name: Exercise failure-path fixture
+      - name: Synthetic verification failure
+        id: synthetic-verify
+        continue-on-error: true
         shell: bash
         run: |
+          echo "Synthetic verify result=failure"
+          exit 1
+
+      - name: Simulated deployment (must be skipped)
+        if: steps.synthetic-verify.outcome == 'success'
+        run: |
+          echo "Failure fixture incorrectly permitted deployment."
+          exit 1
+
+      - name: Assert failure-path gate contract
+        shell: bash
+        env:
+          SYNTHETIC_VERIFY_OUTCOME: ${{ steps.synthetic-verify.outcome }}
+        run: |
           set -euo pipefail
-          grep -q '^    needs: verify$' .github/workflows/.deploy.yml
+          grep -q '^    needs: verify .github/workflows/.deploy.yml
           grep -q "needs.verify.result == 'success'" .github/workflows/.deploy.yml
-
-          verify_result=failure
-          if [[ "$verify_result" == "success" ]]; then
-            echo "Failure fixture incorrectly permits deployment."
-            exit 1
-          fi
-
-          echo "Failure fixture: verify=$verify_result -> build-deploy condition=false -> deployment skipped."
+          test "$SYNTHETIC_VERIFY_OUTCOME" = "failure"
+          echo "Failure fixture: verify=$SYNTHETIC_VERIFY_OUTCOME -> deployment condition=false -> deployment skipped."
